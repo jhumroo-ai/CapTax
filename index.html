@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CapTax - Capital Gains Tax Estimator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            margin: 20px 0;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.75em;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 10px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            margin-top: 10px;
+            padding-top: 15px;
+            border-top: 2px solid #667eea;
+        }
+
+        .result-label {
+            color: #555;
+            font-weight: 600;
+        }
+
+        .result-value {
+            color: #333;
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+
+        .result-value.positive {
+            color: #e74c3c;
+        }
+
+        .result-value.negative {
+            color: #27ae60;
+        }
+
+        .breakdown {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            font-size: 0.9em;
+        }
+
+        .breakdown-title {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .breakdown-item {
+            padding: 5px 0;
+            color: #666;
+        }
+
+        .footer {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            max-width: 800px;
+            width: 100%;
+            margin-top: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .coffee-text {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 1em;
+        }
+
+        .paypal-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #0070ba;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .paypal-btn:hover {
+            background: #005a94;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 112, 186, 0.3);
+        }
+
+        .copyright {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .contact {
+            color: #667eea;
+            font-size: 0.9em;
+        }
+
+        .contact a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .contact a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CapTax - Capital Gains Tax Estimator</h1>
+        <p class="subtitle">Calculate your estimated tax on capital gains and losses</p>
+
+        <div class="input-group">
+            <label for="totalIncome">Total Taxable Income - Dividends, Interest etc. ($)</label>
+            <input type="number" id="totalIncome" placeholder="e.g., 50000" step="0.01">
+        </div>
+
+        <div class="input-group">
+            <label for="longTermGL">Long-Term Capital Gains/Losses ($)</label>
+            <input type="number" id="longTermGL" placeholder="Enter positive for gains, negative for losses" step="0.01">
+        </div>
+
+        <div class="input-group">
+            <label for="shortTermGL">Short-Term Capital Gains/Losses ($)</label>
+            <input type="number" id="shortTermGL" placeholder="Enter positive for gains, negative for losses" step="0.01">
+        </div>
+
+        <div class="row">
+            <div class="input-group">
+                <label for="marginalRate">Your Marginal Tax Rate (%)</label>
+                <select id="marginalRate">
+                    <option value="10">10%</option>
+                    <option value="12">12%</option>
+                    <option value="22" selected>22%</option>
+                    <option value="24">24%</option>
+                    <option value="32">32%</option>
+                    <option value="35">35%</option>
+                    <option value="37">37%</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="ltcgRate">Long-Term Capital Gains Rate (%)</label>
+                <select id="ltcgRate">
+                    <option value="0">0%</option>
+                    <option value="15" selected>15%</option>
+                    <option value="20">20%</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="calculate-btn" onclick="calculateTax()">Calculate Tax</button>
+
+        <div class="results" id="results">
+            <div class="result-item">
+                <span class="result-label">Net Short-Term Gain/Loss:</span>
+                <span class="result-value" id="netShortTerm">$0.00</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Net Long-Term Gain/Loss:</span>
+                <span class="result-value" id="netLongTerm">$0.00</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Estimated Tax on Investment Income:</span>
+                <span class="result-value" id="totalTax">$0.00</span>
+            </div>
+            <div class="breakdown" id="breakdown"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p class="coffee-text">If you found this helpful, you can buy me a coffee 🙂</p>
+        <a href="https://paypal.me/nidwannaya" class="paypal-btn" target="_blank">☕ Buy Me a Coffee</a>
+        <p class="copyright">© 2026 Rajesh Nidwannaya. All rights reserved.</p>
+        <p class="contact">
+            <a href="mailto:raj@nidwannaya.com">raj@nidwannaya.com</a> ~ 
+            <a href="https://www.nidwannaya.com" target="_blank">www.nidwannaya.com</a>
+        </p>
+    </div>
+
+    <script>
+        function calculateTax() {
+            const totalIncome = parseFloat(document.getElementById('totalIncome').value) || 0;
+            const longTermGL = parseFloat(document.getElementById('longTermGL').value) || 0;
+            const shortTermGL = parseFloat(document.getElementById('shortTermGL').value) || 0;
+            const marginalRate = parseFloat(document.getElementById('marginalRate').value) / 100;
+            const ltcgRate = parseFloat(document.getElementById('ltcgRate').value) / 100;
+
+            let netShortTerm = shortTermGL;
+            let netLongTerm = longTermGL;
+            let breakdown = [];
+
+            // Step 1: Offset gains and losses
+            if (shortTermGL > 0 && longTermGL < 0) {
+                // Short-term gain, long-term loss
+                const offset = Math.min(shortTermGL, Math.abs(longTermGL));
+                netShortTerm = shortTermGL - offset;
+                netLongTerm = longTermGL + offset;
+                breakdown.push(`Long-term loss of $${formatNumber(offset)} offsets short-term gain`);
+            } else if (shortTermGL < 0 && longTermGL > 0) {
+                // Short-term loss, long-term gain
+                const offset = Math.min(Math.abs(shortTermGL), longTermGL);
+                netShortTerm = shortTermGL + offset;
+                netLongTerm = longTermGL - offset;
+                breakdown.push(`Short-term loss of $${formatNumber(offset)} offsets long-term gain`);
+            }
+
+            // Step 2: Calculate tax on ordinary income
+            let ordinaryIncomeTax = 0;
+            if (totalIncome > 0) {
+                ordinaryIncomeTax = totalIncome * marginalRate;
+                breakdown.push(`Ordinary income (dividends, interest) of $${formatNumber(totalIncome)} taxed at ${(marginalRate * 100).toFixed(0)}% = $${formatNumber(ordinaryIncomeTax)}`);
+            }
+
+            // Step 3: Calculate tax on capital gains
+            let shortTermTax = 0;
+            let longTermTax = 0;
+
+            if (netShortTerm > 0) {
+                shortTermTax = netShortTerm * marginalRate;
+                breakdown.push(`Short-term gain of $${formatNumber(netShortTerm)} taxed at ${(marginalRate * 100).toFixed(0)}% = $${formatNumber(shortTermTax)}`);
+            } else if (netShortTerm < 0) {
+                breakdown.push(`Net short-term loss: $${formatNumber(Math.abs(netShortTerm))}`);
+            }
+
+            if (netLongTerm > 0) {
+                longTermTax = netLongTerm * ltcgRate;
+                breakdown.push(`Long-term gain of $${formatNumber(netLongTerm)} taxed at ${(ltcgRate * 100).toFixed(0)}% = $${formatNumber(longTermTax)}`);
+            } else if (netLongTerm < 0) {
+                breakdown.push(`Net long-term loss: $${formatNumber(Math.abs(netLongTerm))}`);
+            }
+
+            const totalTax = ordinaryIncomeTax + shortTermTax + longTermTax;
+
+            // Display results
+            document.getElementById('netShortTerm').textContent = formatCurrency(netShortTerm);
+            document.getElementById('netShortTerm').className = 'result-value ' + (netShortTerm >= 0 ? 'positive' : 'negative');
+            
+            document.getElementById('netLongTerm').textContent = formatCurrency(netLongTerm);
+            document.getElementById('netLongTerm').className = 'result-value ' + (netLongTerm >= 0 ? 'positive' : 'negative');
+            
+            document.getElementById('totalTax').textContent = formatCurrency(totalTax);
+            document.getElementById('totalTax').className = 'result-value ' + (totalTax > 0 ? 'positive' : '');
+
+            // Display breakdown
+            let breakdownHTML = '<div class="breakdown-title">Calculation Breakdown:</div>';
+            breakdown.forEach(item => {
+                breakdownHTML += `<div class="breakdown-item">• ${item}</div>`;
+            });
+            
+            if (netShortTerm < 0 && netLongTerm < 0) {
+                const totalLoss = Math.abs(netShortTerm) + Math.abs(netLongTerm);
+                breakdownHTML += `<div class="breakdown-item" style="margin-top: 10px; font-weight: 600;">Total capital loss: $${formatNumber(totalLoss)} (can offset up to $3,000 of ordinary income per year)</div>`;
+            }
+
+            document.getElementById('breakdown').innerHTML = breakdownHTML;
+
+            // Show results
+            document.getElementById('results').classList.add('show');
+        }
+
+        function formatCurrency(value) {
+            const sign = value >= 0 ? '' : '-';
+            return sign + '$' + Math.abs(value).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
+        function formatNumber(value) {
+            return value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+    </script>
+</body>
+</html>
